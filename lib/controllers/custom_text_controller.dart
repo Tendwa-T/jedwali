@@ -33,8 +33,8 @@ class CustomTextController extends StatelessWidget {
             isPassword = !isPassword;
           },
           child: isPassword
-              ? Icon(Icons.visibility_rounded)
-              : Icon(Icons.visibility_off_rounded),
+              ? const Icon(Icons.visibility_rounded)
+              : const Icon(Icons.visibility_off_rounded),
         ),
       ),
     );

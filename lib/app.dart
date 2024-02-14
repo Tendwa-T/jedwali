@@ -10,6 +10,17 @@ class Jedwali extends StatefulWidget {
 class _JedwaliState extends State<Jedwali> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("JEDWALI"),
+      ),
+      body: const Column(
+        children: [
+          Center(
+            child: Text("Welcome home"),
+          ),
+        ],
+      ),
+    );
   }
 }

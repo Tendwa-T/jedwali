@@ -108,7 +108,7 @@ class RegistrationPage extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    print("Rerouting to login...");
+                    debugPrint("Rerouting to login...");
                   },
                   child: const CustomText(
                     label: "Log In",
@@ -125,7 +125,7 @@ class RegistrationPage extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    print("Cancel");
+                    debugPrint("Cancel");
                     _firstNameController.clear();
                     _confPassword.clear();
                     _emailController.clear();
@@ -147,7 +147,7 @@ class RegistrationPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    print("Account Created");
+                    debugPrint("Account Created");
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,

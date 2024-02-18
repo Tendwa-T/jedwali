@@ -1,12 +1,14 @@
 import 'package:Jedwali/configs/constants.dart';
+import 'package:Jedwali/controllers/class_data_controller.dart';
 import 'package:Jedwali/models/demo_data.dart';
 import 'package:Jedwali/widgets/custom_text.dart';
 import 'package:Jedwali/widgets/timer_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:toastification/toastification.dart';
 
 class ClassesPage extends StatelessWidget {
-  const ClassesPage({
+  ClassesPage({
     super.key,
     required this.screenHeight,
     required this.screenWidth,
@@ -15,17 +17,19 @@ class ClassesPage extends StatelessWidget {
   final double screenHeight;
   final double screenWidth;
 
+  final ClassesController _controller = Get.put(ClassesController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         child: Icon(
-          Icons.add,
+          Icons.refresh_outlined,
           color: Theme.of(context).primaryColor,
         ),
         onPressed: () {
-          toastification.show(
+          /* toastification.show(
             context: context,
             type: ToastificationType.info,
             style: ToastificationStyle.flatColored,
@@ -34,7 +38,8 @@ class ClassesPage extends StatelessWidget {
             autoCloseDuration: const Duration(
               seconds: 2,
             ),
-          );
+          ); */
+          _controller.fetchClasses();
         },
       ),
       body: SingleChildScrollView(
@@ -81,27 +86,28 @@ class ClassesPage extends StatelessWidget {
                       fontSize: 30),
                 ),
                 Expanded(
-                  child: ListView.separated(
-                    itemCount: courses.length,
-                    itemBuilder: (context, index) {
-                      final course = courses[index];
-                      return ListTile(
-                        title: Text(
-                          course['course_title'],
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        subtitle: Text(
-                          '${course['course_code']}  |  ${course['day']}  |  ${course['time']}  |  ${course['location']}',
-                        ),
+                  child: Obx(() {
+                    if (_controller.lessons.isEmpty) {
+                      return Center(
+                        child: CircularProgressIndicator(),
                       );
-                    },
-                    separatorBuilder: (context, index) {
-                      return const Divider();
-                    },
-                  ),
+                    } else {
+                      return ListView.separated(
+                        itemCount: _controller.lessons.length,
+                        itemBuilder: (context, index) {
+                          final lesson = _controller.lessons[index];
+                          return ListTile(
+                            title: Text(lesson.course_title),
+                            subtitle: Text(
+                                '${lesson.course_code}  |  ${lesson.day}  |  ${lesson.time}  |  ${lesson.location}  |'),
+                          );
+                        },
+                        separatorBuilder: (context, index) {
+                          return Divider();
+                        },
+                      );
+                    }
+                  }),
                 )
               ],
             ),

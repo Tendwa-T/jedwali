@@ -11,7 +11,7 @@ class Jedwali extends StatefulWidget {
 
 class _JedwaliState extends State<Jedwali> {
   int currentPageIndex = 0;
-  late PageController _pageController = PageController();
+  late final PageController _pageController = PageController();
 
   @override
   void initState() {

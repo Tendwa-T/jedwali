@@ -54,7 +54,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    print("Resetting password...");
+                    debugPrint("Resetting password...");
                   },
                   child: const CustomText(
                     label: "Reset password",
@@ -71,7 +71,7 @@ class LoginPage extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () {
-                    print("Cancel");
+                    debugPrint("Cancel");
                     _passwordController.clear();
                     _usernameController.clear();
                   },

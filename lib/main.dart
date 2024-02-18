@@ -7,7 +7,7 @@ void main() {
     title: "Jedwali",
     initialRoute: '/login',
     routes: {
-      '/login': (BuildContext context) => Login(),
+      '/login': (BuildContext context) => const Login(),
       '/': (BuildContext context) => const Jedwali()
     },
     debugShowCheckedModeBanner: false,

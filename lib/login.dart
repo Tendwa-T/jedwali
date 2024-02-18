@@ -8,9 +8,6 @@ import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-// TODO: Implement BottomSheet widget for Login container
-// TODO: Convert to Stateless widget
-
 class Login extends StatefulWidget {
   const Login({super.key});
 

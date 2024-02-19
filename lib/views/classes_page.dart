@@ -88,7 +88,7 @@ class ClassesPage extends StatelessWidget {
                 Expanded(
                   child: Obx(() {
                     if (_controller.lessons.isEmpty) {
-                      return Center(
+                      return const Center(
                         child: CircularProgressIndicator(),
                       );
                     } else {
@@ -103,7 +103,7 @@ class ClassesPage extends StatelessWidget {
                           );
                         },
                         separatorBuilder: (context, index) {
-                          return Divider();
+                          return const Divider();
                         },
                       );
                     }

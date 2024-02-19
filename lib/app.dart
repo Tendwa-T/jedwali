@@ -1,6 +1,8 @@
+import 'package:Jedwali/controllers/class_data_controller.dart';
 import 'package:Jedwali/views/classes_page.dart';
 import 'package:Jedwali/views/dashboard_page.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class Jedwali extends StatefulWidget {
   const Jedwali({super.key});
@@ -12,10 +14,12 @@ class Jedwali extends StatefulWidget {
 class _JedwaliState extends State<Jedwali> {
   int currentPageIndex = 0;
   late final PageController _pageController = PageController();
+  final ClassesController _controller = Get.put(ClassesController());
 
   @override
   void initState() {
     super.initState();
+    _controller.fetchClasses();
     _pageController.addListener(() {
       setState(() {
         currentPageIndex = _pageController.page!.round();

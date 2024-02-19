@@ -9,7 +9,7 @@ class ClassesController extends GetxController {
   Future<void> fetchClasses() async {
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.0.161:8000/api/v1/lessons/'));
+          .get(Uri.parse('https://jedwali-backend.vercel.app/api/v1/lessons/'));
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         lessons.value =

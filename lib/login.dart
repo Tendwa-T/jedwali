@@ -2,6 +2,7 @@
 
 import 'package:Jedwali/configs/constants.dart';
 import 'package:Jedwali/controllers/login/login_controller.dart';
+import 'package:Jedwali/utils/imageProvider.dart';
 import 'package:Jedwali/views/login_page.dart';
 import 'package:Jedwali/views/registration_page.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
@@ -64,7 +65,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 decoration: BoxDecoration(
                   color: appGrey,
                   image: DecorationImage(
-                    image: _getSVGImage('assets/images/loginPage.svg'),
+                    image: getSVGImage('assets/images/loginPage.svg'),
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -125,8 +126,4 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
       ),
     );
   }
-}
-
-ImageProvider _getSVGImage(String assetName) {
-  return Svg(assetName);
 }

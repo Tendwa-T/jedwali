@@ -99,6 +99,7 @@ class _JedwaliState extends State<Jedwali> {
             screenWidth: screenWidth,
           ),
           const Center(child: Text("Welcome to Assignments")),
+          const Center(child: Text("Welcome to Exams")),
         ],
       ),
     );

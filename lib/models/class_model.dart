@@ -1,12 +1,12 @@
 // ignore_for_file: non_constant_identifier_names
 
 class Classes {
-  final String course_code;
-  final String course_title;
-  final String time;
-  final String day;
-  final String location;
-  var id;
+  late String course_code;
+  late String course_title;
+  late String time;
+  late String day;
+  late String location;
+  late var id;
 
   Classes({
     required this.course_code,
@@ -38,4 +38,13 @@ class Classes {
       _ => throw const FormatException("Failed to load classes"),
     };
   }
+
+  Map<String, dynamic> toJson() => {
+        'course_code': course_code,
+        'course_title': course_title,
+        'time': time,
+        'day': day,
+        'location': location,
+        '_id': id,
+      };
 }

@@ -1,10 +1,16 @@
 import 'package:Jedwali/configs/constants.dart';
+import 'package:Jedwali/controllers/class_data_controller.dart';
+import 'package:Jedwali/controllers/time_picker_controller.dart';
 import 'package:Jedwali/models/demo_data.dart';
+import 'package:Jedwali/views/classes_page.dart';
 import 'package:Jedwali/widgets/custom_text.dart';
 import 'package:Jedwali/widgets/timer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
-import 'package:toastification/toastification.dart';
+import 'package:get/get.dart';
+
+TimePickerController timePickerController = Get.put(TimePickerController());
+ClassesController classesController = Get.put(ClassesController());
 
 class DashBoardPage extends StatelessWidget {
   const DashBoardPage({
@@ -32,17 +38,8 @@ class DashBoardPage extends StatelessWidget {
           Icons.add,
           color: Theme.of(context).primaryColor,
         ),
-        onPressed: () {
-          toastification.show(
-            context: context,
-            type: ToastificationType.info,
-            style: ToastificationStyle.flatColored,
-            title: const Text("Test action button"),
-            description: const Text("Floating Action button pressed"),
-            autoCloseDuration: const Duration(
-              seconds: 2,
-            ),
-          );
+        onPressed: () async {
+          addModalButton(context);
         },
       ),
       body: SingleChildScrollView(
@@ -103,109 +100,119 @@ class DashBoardPage extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: ExpandableCarousel(
-                        options: CarouselOptions(
-                          showIndicator: true,
-                          slideIndicator: const CircularSlideIndicator(),
-                          height: 200,
-                          viewportFraction: 1.0,
-                          autoPlay: true,
-                          autoPlayAnimationDuration: const Duration(seconds: 1),
-                          autoPlayInterval: const Duration(seconds: 4),
-                          autoPlayCurve: Curves.easeInOut,
-                        ),
-                        items: courses.map((e) {
-                          return Builder(
-                            builder: (BuildContext context) {
-                              return Card(
-                                color: const Color(0xFFBDBFFF),
-                                child: SizedBox(
-                                  height: 180,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 16.0,
-                                      right: 16.0,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        const SizedBox(
-                                          height: 15,
-                                        ),
-                                        SizedBox(
-                                          height: 40,
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  e['course_code'],
-                                                  style: const TextStyle(
-                                                    fontSize: 30,
-                                                    fontWeight: FontWeight.w800,
-                                                  ),
-                                                  //softWrap: true,
-                                                ),
-                                              ),
-                                              Text(
-                                                e['location'],
-                                                style: const TextStyle(
-                                                  fontSize: 25,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            SizedBox(
-                                              height: 20,
-                                              child: Text(
-                                                e['course_title'],
-                                                style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
+                      child: Obx(
+                        () => ExpandableCarousel(
+                          options: CarouselOptions(
+                            showIndicator: true,
+                            slideIndicator: const CircularSlideIndicator(),
+                            height: 200,
+                            viewportFraction: 1.0,
+                            autoPlay: true,
+                            autoPlayAnimationDuration:
+                                const Duration(seconds: 1),
+                            autoPlayInterval: const Duration(seconds: 4),
+                            autoPlayCurve: Curves.easeInOut,
+                          ),
+                          items: classesController.lessons.isEmpty
+                              ? [const LinearProgressIndicator()]
+                              : classesController.lessons.map((e) {
+                                  return Builder(
+                                    builder: (BuildContext context) {
+                                      return Card(
+                                        color: const Color(0xFFBDBFFF),
+                                        child: SizedBox(
+                                          height: 180,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 16.0,
+                                              right: 16.0,
                                             ),
-                                          ],
-                                        ),
-                                        Expanded(
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  e['day'],
-                                                  style: const TextStyle(
-                                                    fontSize: 17,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                const SizedBox(
+                                                  height: 15,
+                                                ),
+                                                SizedBox(
+                                                  height: 40,
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          e.course_code,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 30,
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                          ),
+                                                          //softWrap: true,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        e.location,
+                                                        style: const TextStyle(
+                                                          fontSize: 25,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ),
-                                              Text(
-                                                e['time'],
-                                                style: const TextStyle(
-                                                  fontSize: 17,
+                                                const SizedBox(
+                                                  height: 20,
                                                 ),
-                                              ),
-                                            ],
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(
+                                                      height: 20,
+                                                      child: Text(
+                                                        e.course_title,
+                                                        style: const TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Expanded(
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          e.day,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 17,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        e.time,
+                                                        style: const TextStyle(
+                                                          fontSize: 17,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        }).toList(),
+                                      );
+                                    },
+                                  );
+                                }).toList(),
+                        ),
                       ),
                     )
                   ],
@@ -388,6 +395,43 @@ class DashBoardPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> addModalButton(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Choose Action"),
+          content: SingleChildScrollView(
+            child: Container(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          showAddClassDialog(context);
+                        },
+                        child: const Text("Add Class"),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text("Add Assignment"),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

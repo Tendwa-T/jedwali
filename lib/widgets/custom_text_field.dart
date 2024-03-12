@@ -8,22 +8,24 @@ class CustomTextField extends StatelessWidget {
   final IconData? suffIcon;
   final String? hint;
   final double wid;
+  final TextInputType? inputType;
 
-  const CustomTextField({
-    super.key,
-    required this.controller,
-    this.icon,
-    this.suffIcon,
-    this.hint,
-    required this.label,
-    this.wid = double.infinity,
-  });
+  const CustomTextField(
+      {super.key,
+      required this.controller,
+      this.icon,
+      this.suffIcon,
+      this.hint,
+      required this.label,
+      this.wid = double.infinity,
+      this.inputType = TextInputType.text});
 
   final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      keyboardType: inputType,
       controller: controller,
       obscureText: false,
       decoration: InputDecoration(

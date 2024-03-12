@@ -1,31 +1,25 @@
 import 'package:Jedwali/configs/constants.dart';
+import 'package:Jedwali/controllers/login/login_controller.dart';
+import 'package:Jedwali/login.dart';
 import 'package:Jedwali/widgets/custom_password_field.dart';
 import 'package:Jedwali/widgets/custom_text.dart';
 import 'package:Jedwali/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:toastification/toastification.dart';
 
 class RegistrationPage extends StatelessWidget {
-  const RegistrationPage({
+  RegistrationPage({
     super.key,
-    required TextEditingController firstNameController,
-    required TextEditingController lastNameController,
-    required TextEditingController emailController,
-    required TextEditingController phoneNumberController,
-    required TextEditingController passwordController,
-    required TextEditingController confPassword,
-  })  : _firstNameController = firstNameController,
-        _lastNameController = lastNameController,
-        _emailController = emailController,
-        _phoneNumberController = phoneNumberController,
-        _passwordController = passwordController,
-        _confPassword = confPassword;
+  });
 
-  final TextEditingController _firstNameController;
-  final TextEditingController _lastNameController;
-  final TextEditingController _emailController;
-  final TextEditingController _phoneNumberController;
-  final TextEditingController _passwordController;
-  final TextEditingController _confPassword;
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confPassword = TextEditingController();
+  final loginController = Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +35,7 @@ class RegistrationPage extends StatelessWidget {
                     controller: _firstNameController,
                     label: "First Name",
                     hint: "First name",
-                    icon: Icons.person,
+                    icon: Icons.tag_faces,
                   ),
                 ),
                 const SizedBox(
@@ -53,7 +47,7 @@ class RegistrationPage extends StatelessWidget {
                     controller: _lastNameController,
                     label: "Last Name",
                     hint: "Last name",
-                    icon: Icons.person,
+                    icon: Icons.tag_faces,
                   ),
                 ),
               ],
@@ -62,15 +56,16 @@ class RegistrationPage extends StatelessWidget {
               height: 20,
             ),
             CustomTextField(
-              controller: _emailController,
-              label: "Email",
-              hint: "Enter your Email Address",
-              icon: Icons.email,
+              controller: _userNameController,
+              label: "Username",
+              hint: "Enter your Username",
+              icon: Icons.person,
             ),
             const SizedBox(
               height: 20,
             ),
             CustomTextField(
+              inputType: TextInputType.phone,
               controller: _phoneNumberController,
               label: "Phone number",
               hint: "Enter your phone number",
@@ -104,15 +99,16 @@ class RegistrationPage extends StatelessWidget {
               children: [
                 const CustomText(label: "Already have an account?"),
                 const SizedBox(
-                  width: 10,
+                  width: 5,
                 ),
                 GestureDetector(
                   onTap: () {
-                    debugPrint("Rerouting to login...");
+                    // loginKey.currentState?.switchTab(0);
+                    DefaultTabController.of(context).animateTo(0);
                   },
-                  child: const CustomText(
+                  child: CustomText(
                     label: "Log In",
-                    labelColor: Colors.blue,
+                    labelColor: Theme.of(context).primaryColor,
                   ),
                 )
               ],
@@ -128,7 +124,7 @@ class RegistrationPage extends StatelessWidget {
                     debugPrint("Cancel");
                     _firstNameController.clear();
                     _confPassword.clear();
-                    _emailController.clear();
+                    _userNameController.clear();
                     _lastNameController.clear();
                     _phoneNumberController.clear();
                     _passwordController.clear();
@@ -147,7 +143,28 @@ class RegistrationPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    debugPrint("Account Created");
+                    toastification.show(
+                        showProgressBar: false,
+                        context: context,
+                        type: ToastificationType.success,
+                        title: const Text("Success!!"),
+                        style: ToastificationStyle.flatColored,
+                        autoCloseDuration: const Duration(seconds: 1),
+                        description: const Text("Account Created Successfully"),
+                        callbacks: ToastificationCallbacks(
+                          onAutoCompleteCompleted: (value) {
+                            DefaultTabController.of(context).animateTo(0);
+                          },
+                          onCloseButtonTap: (value) {
+                            DefaultTabController.of(context).animateTo(0);
+                          },
+                          onDismissed: (value) {
+                            DefaultTabController.of(context).animateTo(0);
+                          },
+                          onTap: (value) {
+                            DefaultTabController.of(context).animateTo(0);
+                          },
+                        ));
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor,

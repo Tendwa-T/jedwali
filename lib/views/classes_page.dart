@@ -88,7 +88,7 @@ class ClassesPage extends StatelessWidget {
                 const SizedBox(
                   height: 15,
                 ),
-                const Row(
+                Row(
                   children: [TimerWidget()],
                 ),
                 const SizedBox(
@@ -282,6 +282,15 @@ void showAddClassDialog(BuildContext context) {
               String time = timeController.text;
               String location = locationController.text;
 
+              Classes newClass = Classes(
+                course_code: courseCode,
+                course_title: courseTitle,
+                time: time,
+                day: day,
+                location: location,
+              );
+
+              classesController.createClass(newClass);
               // Perform any necessary actions with the entered data
               // For example, create a new class object and save it
 

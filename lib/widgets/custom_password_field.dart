@@ -2,6 +2,7 @@
 
 import 'package:Jedwali/controllers/login/login_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class CustomPasswordField extends StatelessWidget {
@@ -11,6 +12,8 @@ class CustomPasswordField extends StatelessWidget {
   final bool isPassword;
   final String? hint;
   final double wid;
+  final TextInputAction? inputAction;
+  final VoidCallbackAction? action;
 
   CustomPasswordField({
     super.key,
@@ -20,11 +23,13 @@ class CustomPasswordField extends StatelessWidget {
     this.isPassword = false,
     this.hint,
     required this.label,
+    this.inputAction = TextInputAction.done,
     this.wid = double.infinity,
+    this.action,
   });
 
   final TextEditingController controller;
-  LoginController loginController = Get.put(LoginController());
+  LoginController loginController = Get.find<LoginController>();
   bool get hideTextValue => loginController.hideText.value;
 
   @override

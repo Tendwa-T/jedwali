@@ -10,10 +10,10 @@ import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:get/get.dart';
 
 TimePickerController timePickerController = Get.put(TimePickerController());
-ClassesController classesController = Get.put(ClassesController());
+ClassesController classesController = Get.find<ClassesController>();
 
 class DashBoardPage extends StatelessWidget {
-  const DashBoardPage({
+  DashBoardPage({
     super.key,
     required this.screenHeight,
     required this.screenWidth,
@@ -71,7 +71,7 @@ class DashBoardPage extends StatelessWidget {
                 const SizedBox(
                   height: 15,
                 ),
-                const Row(
+                Row(
                   children: [TimerWidget()],
                 ),
                 const SizedBox(
@@ -282,23 +282,21 @@ class DashBoardPage extends StatelessWidget {
                                                 child: Row(
                                                   children: [
                                                     Expanded(
-                                                      child: Text(
-                                                        e['course_code'],
-                                                        style: const TextStyle(
-                                                          fontSize: 30,
-                                                          fontWeight:
-                                                              FontWeight.w800,
-                                                        ),
-                                                        //softWrap: true,
+                                                      child: CustomText(
+                                                        label: e['course_code'],
+                                                        labelColor:
+                                                            Colors.black,
+                                                        fontSize: 30,
+                                                        fontWeight:
+                                                            FontWeight.w800,
                                                       ),
                                                     ),
-                                                    Text(
-                                                      e['location'],
-                                                      style: const TextStyle(
-                                                        fontSize: 25,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
+                                                    CustomText(
+                                                      label: e['location'],
+                                                      labelColor: Colors.black,
+                                                      fontSize: 25,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ],
                                                 ),
@@ -312,13 +310,11 @@ class DashBoardPage extends StatelessWidget {
                                                 children: [
                                                   SizedBox(
                                                     height: 20,
-                                                    child: Text(
-                                                      e['course_title'],
-                                                      style: const TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
+                                                    child: CustomText(
+                                                      label: e['course_title'],
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w400,
                                                     ),
                                                   ),
                                                 ],
@@ -327,18 +323,14 @@ class DashBoardPage extends StatelessWidget {
                                                 child: Row(
                                                   children: [
                                                     Expanded(
-                                                      child: Text(
-                                                        e['day'],
-                                                        style: const TextStyle(
-                                                          fontSize: 20,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      e['time'],
-                                                      style: const TextStyle(
+                                                      child: CustomText(
+                                                        label: e['day'],
                                                         fontSize: 20,
                                                       ),
+                                                    ),
+                                                    CustomText(
+                                                      label: e['time'],
+                                                      fontSize: 20,
                                                     ),
                                                   ],
                                                 ),
@@ -371,11 +363,9 @@ class DashBoardPage extends StatelessWidget {
                                                 MainAxisAlignment.center,
                                             children: [
                                               Center(
-                                                child: Text(
-                                                  "No Assignments ",
-                                                  style: TextStyle(
-                                                    fontSize: 17,
-                                                  ),
+                                                child: CustomText(
+                                                  label: "No Assignments ",
+                                                  fontSize: 17,
                                                 ),
                                               )
                                             ],

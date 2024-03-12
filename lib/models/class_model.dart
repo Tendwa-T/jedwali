@@ -6,7 +6,7 @@ class Classes {
   late String time;
   late String day;
   late String location;
-  late var id;
+  late String? id;
 
   Classes({
     required this.course_code,
@@ -14,7 +14,7 @@ class Classes {
     required this.time,
     required this.day,
     required this.location,
-    required this.id,
+    this.id,
   });
 
   factory Classes.fromJson(Map<String, dynamic> json) {

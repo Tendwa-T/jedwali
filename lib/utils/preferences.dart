@@ -1,3 +1,4 @@
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Preferences {
@@ -19,5 +20,20 @@ class Preferences {
   Future<bool> getBooleanValue(key) async {
     SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
     return sharedPrefs.getBool(key) ?? false;
+  }
+}
+
+class PrefsController extends GetxController {
+  final Preferences prefs = Preferences();
+  RxString name = "".obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    loadName();
+  }
+
+  void loadName() async {
+    name.value = await prefs.getValue("name");
   }
 }

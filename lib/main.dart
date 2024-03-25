@@ -1,96 +1,102 @@
+import 'dart:convert';
+
 import 'package:Jedwali/controllers/class_data_controller.dart';
+import 'package:Jedwali/controllers/fire_controller.dart';
+import 'package:Jedwali/firebase_options.dart';
 import 'package:Jedwali/notifications/notifications_service.dart';
+import 'package:Jedwali/utils/logger_utils.dart';
 import 'package:Jedwali/utils/routes.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart';
 import 'package:workmanager/workmanager.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await setupFlutterNotifications();
+  showFlutterNotification(message);
+}
 
-ClassesController _controller = Get.put(ClassesController());
+late AndroidNotificationChannel channel;
+bool isFlutterLocalNotificationsInitialized = false;
+late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+JLogger logger = JLogger();
 
-void callbackDispatcher() {
-  Workmanager().executeTask((taskName, inputData) async {
-    String className = inputData?["className"] ?? "Unknown class";
-    String location = inputData?["location"] ?? "Unknown location";
-    String cCode = inputData?["code"] ?? "TST-00-";
-    await showClassNotification(
-      "Class Reminder ⏰ $cCode",
-      "$className at $location",
+Future<void> setupFlutterNotifications() async {
+  if (isFlutterLocalNotificationsInitialized) {
+    return;
+  }
+  channel = const AndroidNotificationChannel(
+    "high_Importance_Jedwali",
+    "Jedwali High Importance",
+    description: "A test channel for High importance Jedwali Notifications",
+    importance: Importance.high,
+  );
+
+  flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+  isFlutterLocalNotificationsInitialized = true;
+}
+
+void showFlutterNotification(RemoteMessage message) {
+  RemoteNotification? notification = message.notification;
+  flutterLocalNotificationsPlugin.show(
+    notification.hashCode,
+    notification?.title,
+    notification?.body,
+    NotificationDetails(
+      android: AndroidNotificationDetails(channel.id, channel.name,
+          channelDescription: channel.description, icon: '@mipmap/ic_launcher'),
+    ),
+  );
+}
+
+void showLocalNoti(message) {
+  var decodedMessage = jsonDecode(message);
+  try {
+    print(decodedMessage);
+    flutterLocalNotificationsPlugin.show(
+      1001,
+      decodedMessage['notification']['title'],
+      decodedMessage['notification']['body'],
+      NotificationDetails(
+        android: AndroidNotificationDetails(channel.id, channel.name,
+            channelDescription: channel.description,
+            icon: '@mipmap/ic_launcher'),
+      ),
     );
-    return Future.value(true);
-  });
+  } catch (e) {
+    logger.errorLog("Failed to show Notification", e);
+  }
 }
 
-Future<void> showNotification() async {
-  var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-    "0000",
-    "Jedwali Notifications",
-    channelDescription: "Test Channel ",
-    importance: Importance.max,
-    priority: Priority.high,
-    showWhen: false,
-  );
-
-  var platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
-
-  await flutterLocalNotificationsPlugin.show(
-    0,
-    "Jedwali Notification",
-    "Test notification ",
-    platformChannelSpecifics,
-  );
-}
-
-Future<void> showClassNotification(String title, String body) async {
-  var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-    "Class-000CH",
-    "Class Notification - Test",
-    channelDescription: "The official Class Test Channel ",
-    importance: Importance.max,
-    priority: Priority.high,
-  );
-
-  var platformChannelSpecifics = NotificationDetails(
-    android: androidPlatformChannelSpecifics,
-  );
-  await flutterLocalNotificationsPlugin.show(
-    0,
-    title,
-    body,
-    platformChannelSpecifics,
-  );
-}
-
-void scheduleClassNotificationWorker(
-    String className, String location, String code) {
-  Workmanager().registerOneOffTask(
-    "Class-notifications",
-    "Jedwali: Class notifications",
-    inputData: {
-      "className": className,
-      "location": location,
-      "code": code,
-    },
-    initialDelay: const Duration(seconds: 1),
-  );
-}
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  var initializationSettingsAndroid =
-      const AndroidInitializationSettings('@mipmap/ic_launcher');
-  var initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
+  FireController fireController = Get.put(FireController());
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-
-  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
-
+  await setupFlutterNotifications();
+  fireController.updateToken(await FirebaseMessaging.instance.getToken());
+  print(fireController.token.value);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen(showFlutterNotification);
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    Get.toNamed("/");
+  });
   runApp(GetMaterialApp(
     title: "Jedwali",
     initialRoute: '/login',

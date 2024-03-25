@@ -98,6 +98,32 @@ class ClassesController extends GetxController {
     }
   }
 
+  Future<void> deleteClass(Classes delClass) async {
+    String apiUrl =
+        'https://jedwali-backend.vercel.app/api/v1/lessons/lessons/${delClass.id}';
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        "Content-type": "application/json; charset=utf-8",
+      },
+      body: jsonEncode(delClass.toJson()),
+    );
+    try {
+      if (response.statusCode == 200) {
+        Get.snackbar(
+          "Class Deleted",
+          "Class has successfully been Deleted",
+        );
+        fetchClasses();
+      } else {
+        throw Exception("${response.body} ");
+      }
+    } catch (e) {
+      print(e);
+      Get.snackbar("Error", e.toString());
+    }
+  }
+
   Future<void> createClass(Classes newClass) async {
     String apiUrl = 'https://jedwali-backend.vercel.app/api/v1/lessons/create';
 
@@ -129,30 +155,40 @@ class ClassesController extends GetxController {
 
   Duration timeToNextClass() {
     DateTime now = DateTime.now().toLocal();
-    Duration timeToNext = Duration(days: 31); // Initialize with a large value
+    Duration timeToNext =
+        const Duration(days: 31); // Initialize with a large value
 
     for (var lesson in lessons) {
       var lessonTime = lesson.time;
-      int lessonDay = daysofWeek[lesson.day] ?? 0;
-
+      int lessonDay = daysofWeek[lesson.day]!;
       List<String> timeparts = lessonTime.split(" - ");
 
-      // Calculate the next date for the lesson
-      String nextDate = "${nextDateOfDay(lessonDay)} ${timeparts[0]}";
-      DateTime lessonStart = DateTime.parse(nextDate).toLocal();
+      if (lessonDay == now.weekday) {
+        String lessonStartTime =
+            "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${timeparts[0]}";
+        DateTime lessonStart = DateTime.parse(lessonStartTime).toLocal();
+        if (lessonStart.isAfter(now)) {
+          Duration duration = lessonStart.difference(now);
 
-      // Calculate the duration until the next lesson
-      Duration duration = lessonStart.difference(now);
+          if (duration < timeToNext) {
+            timeToNext = duration;
+            currentClass = lesson;
+          }
+        }
+      } else {
+        String lessonStartTime = "${nextDateOfDay(lessonDay)} ${timeparts[0]}";
+        DateTime lessonStart = DateTime.parse(lessonStartTime).toLocal();
+        Duration duration = lessonStart.difference(now);
 
-      // Update timeToNext if the current lesson is closer than the previously found lesson
-      if (duration < timeToNext) {
-        timeToNext = duration;
+        if (duration < timeToNext) {
+          timeToNext = duration;
+          currentClass = lesson;
+        }
       }
     }
 
     // Update the observable value
     toNext.value = timeToNext;
-    print(timeToNext);
 
     return timeToNext;
   }

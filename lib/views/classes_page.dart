@@ -187,6 +187,28 @@ void showEditModal(BuildContext context, Classes lesson) {
           ],
         ),
         actions: [
+          IconButton(
+              onPressed: () async {
+                // Save the edited data
+                lesson.course_title = courseTitleController.text;
+                lesson.course_code = courseCodeController.text;
+                lesson.day = dayController.text;
+                lesson.time = timeController.text;
+                lesson.location = locationController.text;
+                Classes delClass = Classes(
+                  course_code: lesson.course_code,
+                  course_title: lesson.course_title,
+                  time: lesson.time,
+                  day: lesson.day,
+                  location: lesson.location,
+                  id: lesson.id,
+                );
+                await classesController.deleteClass(delClass);
+                // Perform any other necessary actions
+
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.delete)),
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();

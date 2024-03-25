@@ -1,15 +1,13 @@
 import 'package:Jedwali/configs/constants.dart';
 import 'package:Jedwali/controllers/login/login_controller.dart';
-import 'package:Jedwali/login.dart';
 import 'package:Jedwali/utils/preferences.dart';
 import 'package:Jedwali/widgets/custom_password_field.dart';
 import 'package:Jedwali/widgets/custom_text.dart';
 import 'package:Jedwali/widgets/custom_text_field.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:toastification/toastification.dart';
+import 'dart:ui' as ui;
 
 class LoginPage extends StatelessWidget {
   LoginPage({
@@ -22,6 +20,7 @@ class LoginPage extends StatelessWidget {
   Preferences preferences = Preferences();
   @override
   Widget build(BuildContext context) {
+    final RxBool isLoading = false.obs;
     preferences.getValue("username").then((value) {
       _usernameController.text = value;
     });
@@ -107,45 +106,28 @@ class LoginPage extends StatelessWidget {
                   onPressed: () async {
                     var uName = _usernameController.text;
                     var pWord = _passwordController.text;
-                    if (loginController.validateLogin(uName, pWord) == true) {
+                    loginController.updateLoading(true);
+                    if ((await loginController.userLogin(uName, pWord)) ==
+                        true) {
+                      loginController.updateLoading(false);
                       if (await loginController.rememberMe == true) {
                         await preferences.setValueString("username", uName);
+                        loginController.updateLoading(false);
                       } else {
                         await preferences.setValueString("username", "");
+                        loginController.updateLoading(false);
                       }
                       _passwordController.clear();
                       _usernameController.clear();
-                      toastification.show(
-                          showProgressBar: false,
-                          context: context,
-                          type: ToastificationType.success,
-                          title: const Text("Success!!"),
-                          style: ToastificationStyle.flatColored,
-                          autoCloseDuration: const Duration(seconds: 1),
-                          description: Text("Welcome $uName"),
-                          callbacks: ToastificationCallbacks(
-                            onAutoCompleteCompleted: (value) {
-                              Navigator.of(context).pushNamed('/');
-                            },
-                            onCloseButtonTap: (value) {
-                              Navigator.of(context).pushNamed('/');
-                            },
-                            onDismissed: (value) {
-                              Navigator.of(context).pushNamed('/');
-                            },
-                            onTap: (value) {
-                              Navigator.of(context).pushNamed('/');
-                            },
-                          ));
-                    } else {
-                      loginController.showErrorModal(context);
                     }
+                    loginController.updateLoading(false);
                   },
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: appWhite,
-                      elevation: 4,
-                      fixedSize: const Size(100, 30)),
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: appWhite,
+                    elevation: 4,
+                    fixedSize: const Size(100, 30),
+                  ),
                   child: const CustomText(
                     label: "Sign in",
                     labelColor: appWhite,
@@ -181,9 +163,23 @@ class LoginPage extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
+            Obx(() =>
+            loginController.isLoading.value ? _buildLoadingScreen() : SizedBox.shrink()),
           ],
         ),
       ),
     );
   }
+}
+
+Widget _buildLoadingScreen() {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: BackdropFilter(
+      filter: ui.ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+      child: const Center(
+        child: CircularProgressIndicator(),
+      ),
+    ),
+  );
 }

@@ -2,15 +2,20 @@ import 'package:Jedwali/configs/constants.dart';
 import 'package:Jedwali/controllers/class_data_controller.dart';
 import 'package:Jedwali/controllers/time_picker_controller.dart';
 import 'package:Jedwali/models/demo_data.dart';
+import 'package:Jedwali/utils/preferences.dart';
 import 'package:Jedwali/views/classes_page.dart';
 import 'package:Jedwali/widgets/custom_text.dart';
 import 'package:Jedwali/widgets/timer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/get_state_manager.dart';
 
 TimePickerController timePickerController = Get.put(TimePickerController());
 ClassesController classesController = Get.find<ClassesController>();
+PrefsController prefsController = Get.put(PrefsController());
+Preferences prefs = Preferences();
+TextEditingController dispName = TextEditingController();
 
 class DashBoardPage extends StatelessWidget {
   DashBoardPage({
@@ -45,8 +50,8 @@ class DashBoardPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxHeight: screenHeight - 80,
-            maxWidth: screenWidth,
+            maxHeight: screenHeight * 1,
+            maxWidth: screenWidth ,
           ),
           child: Padding(
             padding: const EdgeInsets.only(
@@ -59,12 +64,14 @@ class DashBoardPage extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                const Row(
+                Row(
                   children: [
-                    CustomText(
-                      label: "Welcome Tendwa! 👋",
-                      fontSize: 40,
-                      labelColor: primaryColor,
+                    Obx(
+                      () => CustomText(
+                        label: "Welcome ${prefsController.name.value}! 👋",
+                        fontSize: 38,
+                        labelColor: primaryColor,
+                      ),
                     ),
                   ],
                 ),
@@ -175,7 +182,7 @@ class DashBoardPage extends StatelessWidget {
                                                       child: Text(
                                                         e.course_title,
                                                         style: const TextStyle(
-                                                          fontSize: 20,
+                                                          fontSize: 18,
                                                           fontWeight:
                                                               FontWeight.w400,
                                                         ),

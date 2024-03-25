@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "425261138142",
+    "project_id": "jedwali-project-jan",
+    "storage_bucket": "jedwali-project-jan.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:425261138142:android:51960a04be975e100a424f",
+        "android_client_info": {
+          "package_name": "com.example.end_sem_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjI1nMVy3QlHFEkNUgVzIOjPr0DCClcts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

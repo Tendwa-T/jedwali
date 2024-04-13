@@ -1,22 +1,29 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:Jedwali/models/class_model.dart';
+import 'package:jedwali/configs/constants.dart';
+import 'package:jedwali/main.dart';
+import 'package:jedwali/models/class_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-
-TextEditingController _courseCodeCtrl = TextEditingController();
-TextEditingController _courseTitleCtrl = TextEditingController();
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:jedwali/utils/preferences.dart';
 
 class ClassesController extends GetxController {
   var lessons = <Classes>[].obs;
+  var isLoadingClasses = false.obs;
   Classes? newClass;
-  Rx<Duration> toNext = Duration(days: 31).obs;
+  Rx<Duration> toNext = const Duration(days: 31).obs;
   Classes? currentClass;
-  Rx<Duration> testDuration = Duration(minutes: 1).obs;
+  Rx<Duration> testDuration = const Duration(minutes: 1).obs;
   Timer? _timer;
+  Preferences prefs = Preferences();
+  late String studentID;
+
+  Map<String, String> classData = {};
+  var selectedCourseCode = "".obs;
+  var selectedCourseName = "".obs;
 
   @override
   void onInit() {
@@ -31,9 +38,17 @@ class ClassesController extends GetxController {
   }
 
   void _startTimer() {
-    _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
       checkAndUpdateTimeToNext();
     });
+  }
+
+  void updateSelectedCourse(String code) {
+    selectedCourseCode.value = code;
+    var matchingEntry = classData.entries.firstWhere(
+      (element) => element.value == code,
+    );
+    selectedCourseName.value = matchingEntry.key;
   }
 
   void checkAndUpdateTimeToNext() {
@@ -52,27 +67,66 @@ class ClassesController extends GetxController {
     "Friday": 5,
   };
   Future<void> fetchClasses() async {
-    lessons.value = [];
+    isLoadingClasses.value = true;
+    studentID = await prefs.getValue("student_id");
     try {
+      if (await InternetConnection().hasInternetAccess == false) {
+        Get.snackbar(
+          "Error",
+          "No internet Access",
+          icon: const Icon(
+            Icons.wifi_off,
+          ),
+          backgroundColor: Colors.red.withOpacity(0.5),
+        );
+        isLoadingClasses.value = false;
+        return;
+      }
       final response = await http
-          .get(Uri.parse('https://jedwali-backend.vercel.app/api/v1/lessons/'));
+          .get(Uri.parse("$baseAPI/api/v1/courses/student/$studentID"));
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
         lessons.value =
             jsonResponse.map((data) => Classes.fromJson(data)).toList();
-        Get.snackbar("Success", "Classes fetched");
+        logger.infoLog("Fetched Classes: ${DateTime.now()}");
+        isLoadingClasses.value = false;
         updateTimer();
       } else {
-        throw Exception("Failed to load classes");
+        isLoadingClasses.value = false;
+        throw Exception("Failed to load classes ${response.body}");
       }
+      for (var lesson in lessons.value) {
+        classData[lesson.courseCode] = lesson.id ?? "";
+      }
+      selectedCourseCode.value = classData.values.first;
     } catch (e) {
-      Get.snackbar("Error", "Could not fetch classes");
+      isLoadingClasses.value = false;
+
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        icon: const Icon(
+          Icons.cancel,
+        ),
+        backgroundColor: Colors.red.withOpacity(0.5),
+      );
+      return;
     }
   }
 
-  Future<void> updateCLass(Classes updatedClass) async {
-    String apiUrl =
-        'https://jedwali-backend.vercel.app/api/v1/lessons/lessons/${updatedClass.id}';
+  Future<void> updateClass(Classes updatedClass) async {
+    if (await InternetConnection().hasInternetAccess == false) {
+      Get.snackbar(
+        "Error",
+        "No internet Access",
+        icon: const Icon(
+          Icons.wifi_off,
+        ),
+        backgroundColor: Colors.red.withOpacity(0.5),
+      );
+      return;
+    }
+    String apiUrl = '$baseAPI/api/v1/courses/course/${updatedClass.id}';
 
     final response = await http.put(
       Uri.parse(apiUrl),
@@ -85,7 +139,11 @@ class ClassesController extends GetxController {
       if (response.statusCode == 200) {
         Get.snackbar(
           "Class Updated",
-          "Class ${updatedClass.course_code} updated",
+          "Class ${updatedClass.courseCode} updated",
+          icon: const Icon(
+            Icons.check,
+          ),
+          backgroundColor: Colors.green.withOpacity(0.5),
         );
         fetchClasses();
       } else {
@@ -93,39 +151,77 @@ class ClassesController extends GetxController {
         throw Exception("${response.statusCode}");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
-      fetchClasses();
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        icon: const Icon(
+          Icons.cancel,
+        ),
+        backgroundColor: Colors.red.withOpacity(0.5),
+      );
+      return;
     }
   }
 
-  Future<void> deleteClass(Classes delClass) async {
-    String apiUrl =
-        'https://jedwali-backend.vercel.app/api/v1/lessons/lessons/${delClass.id}';
+  Future<void> deleteClass(id) async {
+    if (await InternetConnection().hasInternetAccess == false) {
+      Get.snackbar(
+        "Error",
+        "No internet Access",
+        icon: const Icon(
+          Icons.wifi_off,
+        ),
+        backgroundColor: Colors.red.withOpacity(0.5),
+      );
+      return;
+    }
+    String apiUrl = '$baseAPI/api/v1/courses/course/$id';
     final response = await http.delete(
       Uri.parse(apiUrl),
       headers: <String, String>{
         "Content-type": "application/json; charset=utf-8",
       },
-      body: jsonEncode(delClass.toJson()),
     );
     try {
       if (response.statusCode == 200) {
         Get.snackbar(
           "Class Deleted",
           "Class has successfully been Deleted",
+          icon: const Icon(
+            Icons.check,
+          ),
+          backgroundColor: Colors.green.withOpacity(0.5),
         );
         fetchClasses();
       } else {
-        throw Exception("${response.body} ");
+        throw Exception(response.body);
       }
     } catch (e) {
-      print(e);
-      Get.snackbar("Error", e.toString());
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        icon: const Icon(
+          Icons.cancel,
+        ),
+        backgroundColor: Colors.red.withOpacity(0.5),
+      );
+      return;
     }
   }
 
   Future<void> createClass(Classes newClass) async {
-    String apiUrl = 'https://jedwali-backend.vercel.app/api/v1/lessons/create';
+    if (await InternetConnection().hasInternetAccess == false) {
+      Get.snackbar(
+        "Error",
+        "No internet Access",
+        icon: const Icon(
+          Icons.wifi_off,
+        ),
+        backgroundColor: Colors.red.withOpacity(0.5),
+      );
+      return;
+    }
+    String apiUrl = '$baseAPI/api/v1/courses/create';
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -136,16 +232,28 @@ class ClassesController extends GetxController {
     );
     try {
       if (response.statusCode == 201) {
+        fetchClasses();
         Get.snackbar(
           "Class Updated",
-          "Class ${newClass.course_code} Added",
+          "Class ${newClass.courseCode} Added",
+          icon: const Icon(
+            Icons.check,
+          ),
+          backgroundColor: Colors.green.withOpacity(0.5),
         );
-        fetchClasses();
       } else {
         throw Exception("${response.body} ");
       }
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        icon: const Icon(
+          Icons.cancel,
+        ),
+        backgroundColor: Colors.red.withOpacity(0.5),
+      );
+      return;
     }
   }
 
@@ -156,7 +264,7 @@ class ClassesController extends GetxController {
   Duration timeToNextClass() {
     DateTime now = DateTime.now().toLocal();
     Duration timeToNext =
-        const Duration(days: 31); // Initialize with a large value
+        const Duration(days: 8); // Initialize with a large value
 
     for (var lesson in lessons) {
       var lessonTime = lesson.time;

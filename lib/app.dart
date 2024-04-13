@@ -1,8 +1,11 @@
-import 'package:Jedwali/controllers/class_data_controller.dart';
-import 'package:Jedwali/views/classes_page.dart';
-import 'package:Jedwali/views/dashboard_page.dart';
+import 'package:jedwali/controllers/assignment_controller.dart';
+import 'package:jedwali/controllers/class_data_controller.dart';
+import 'package:jedwali/views/pages/assignments/assignments_page.dart';
+import 'package:jedwali/views/classes_page.dart';
+import 'package:jedwali/views/dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:jedwali/views/pages/profiles/profile.dart';
 
 class Jedwali extends StatefulWidget {
   const Jedwali({super.key});
@@ -13,37 +16,39 @@ class Jedwali extends StatefulWidget {
 
 class _JedwaliState extends State<Jedwali> {
   int currentPageIndex = 0;
-  late final PageController _pageController = PageController();
+  final PageController pageController = Get.put(PageController());
   final ClassesController _controller = Get.put(ClassesController());
+  final AssignmentController _assignmentController =
+      Get.put(AssignmentController());
 
   @override
   void initState() {
     super.initState();
-    _controller.fetchClasses();
-    _pageController.addListener(() {
+    _controller.fetchClasses().then((value) {
+      _assignmentController.fetchAssignments();
+    });
+
+    pageController.addListener(() {
       setState(() {
-        currentPageIndex = _pageController.page!.round();
+        currentPageIndex = pageController.page!.round();
       });
     });
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (int index) {
           setState(() {
             currentPageIndex = index;
-            _pageController.animateToPage(
+            pageController.animateToPage(
               index,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
@@ -78,28 +83,22 @@ class _JedwaliState extends State<Jedwali> {
             label: "ASSIGNMENT",
           ),
           NavigationDestination(
-            icon: Icon(Icons.quiz),
+            icon: Icon(Icons.person),
             selectedIcon: Icon(
-              Icons.quiz,
+              Icons.person,
               color: Colors.white,
             ),
-            label: "EXAMS",
+            label: "PROFILE",
           ),
         ],
       ),
       body: PageView(
-        controller: _pageController,
+        controller: pageController,
         children: [
-          DashBoardPage(
-            screenHeight: screenHeight,
-            screenWidth: screenWidth,
-          ),
-          ClassesPage(
-            screenHeight: screenHeight,
-            screenWidth: screenWidth,
-          ),
-          const Center(child: Text("Welcome to Assignments")),
-          const Center(child: Text("Welcome to Exams")),
+          const DashBoardPage(),
+          ClassesPage(),
+          const AssignmentsPage(),
+          const ProfilePage(),
         ],
       ),
     );

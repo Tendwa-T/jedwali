@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:Jedwali/configs/constants.dart';
-import 'package:Jedwali/controllers/class_data_controller.dart';
-import 'package:Jedwali/controllers/fire_controller.dart';
-import 'package:Jedwali/main.dart';
-import 'package:Jedwali/notifications/notifications_service.dart';
-import 'package:Jedwali/utils/logger_utils.dart';
-import 'package:Jedwali/views/dashboard_page.dart';
+import 'package:jedwali/configs/constants.dart';
+import 'package:jedwali/controllers/class_data_controller.dart';
+import 'package:jedwali/controllers/fire_controller.dart';
+import 'package:jedwali/main.dart';
+import 'package:jedwali/utils/logger_utils.dart';
+import 'package:jedwali/views/dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_timer_countdown/flutter_timer_countdown.dart';
 import 'package:get/get.dart';
@@ -38,59 +37,81 @@ class TimerWidget extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Next class in: ",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  Obx(
+                    () {
+                      if (controller.lessons.isEmpty) {
+                        return const SizedBox();
+                      } else {
+                        return const Text(
+                          "Next class in: ",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(
                     height: 15,
                   ),
                   Obx(
-                    () => TimerCountdown(
-                      format: CountDownTimerFormat.daysHoursMinutesSeconds,
-                      timeTextStyle: const TextStyle(
-                        fontSize: 50,
-                        color: Colors.white,
-                      ),
-                      descriptionTextStyle: const TextStyle(
-                        color: appWhite,
-                      ),
-                      colonsTextStyle: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 40,
-                      ),
-                      endTime: DateTime.now().add(_controller.toNext.value),
-                      onEnd: () async{
-                        bool isConnected = await InternetConnection().hasInternetAccess;
-                        if (isConnected){
-                          showLocalNoti(
-                            fcmPayload(
-                              fireController.token.value,
-                              classesController.currentClass?.course_title ??
-                                  " No title",
-                              classesController.currentClass?.course_code ??
-                                  "No code",
-                              classesController.currentClass?.location ??
-                                  "No location",
+                    () {
+                      if (controller.lessons.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "No Upcoming class",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
                             ),
-                          );
-                        }else{
-                          try {
-                            sendPushMessage();
-                            logger.infoLog("Notification Sent");
-                          } catch (e) {
-                            logger.debugLog(e);
-                            logger.errorLog("An error Occurred", e);
-                          }
-                        }
-
-
-                      },
-                    ),
+                          ),
+                        );
+                      } else {
+                        return TimerCountdown(
+                          format: CountDownTimerFormat.daysHoursMinutesSeconds,
+                          timeTextStyle: const TextStyle(
+                            fontSize: 50,
+                            color: Colors.white,
+                          ),
+                          descriptionTextStyle: const TextStyle(
+                            color: appWhite,
+                          ),
+                          colonsTextStyle: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 40,
+                          ),
+                          endTime: DateTime.now().add(_controller.toNext.value),
+                          onEnd: () async {
+                            bool isConnected =
+                                await InternetConnection().hasInternetAccess;
+                            if (isConnected) {
+                              showLocalNoti(
+                                fcmPayload(
+                                  fireController.token.value,
+                                  classesController.currentClass?.courseTitle ??
+                                      " No title",
+                                  classesController.currentClass?.courseCode ??
+                                      "No code",
+                                  classesController.currentClass?.location ??
+                                      "No location",
+                                ),
+                              );
+                            } else {
+                              try {
+                                sendPushMessage();
+                                logger.infoLog("Notification Sent");
+                              } catch (e) {
+                                logger.debugLog(e);
+                                logger.errorLog("An error Occurred", e);
+                              }
+                            }
+                          },
+                        );
+                      }
+                    },
                   )
                 ],
               ),
@@ -126,8 +147,8 @@ class TimerWidget extends StatelessWidget {
         },
         body: fcmPayload(
           fireController.token.value,
-          classesController.currentClass?.course_title ?? " No title",
-          classesController.currentClass?.course_code ?? "No code",
+          classesController.currentClass?.courseTitle ?? " No title",
+          classesController.currentClass?.courseCode ?? "No code",
           classesController.currentClass?.location ?? "No location",
         ),
       );

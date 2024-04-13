@@ -43,4 +43,75 @@ List<Map<String, dynamic>> courses = [
   },
 ];
 
-List<Map<String, dynamic>> assignments = [];
+List<Map<String, dynamic>> assignments = [
+  {
+    "title": "Math Homework",
+    "courseCode": "MATH101",
+    "dueDate": "2024-04-04 19:52:20.763",
+    "submitted": false,
+    "note": "Chapter 5 problems",
+  },
+  {
+    "title": "English Essay",
+    "courseCode": "ENGL101",
+    "dueDate": "2024-04-07 19:52:20.763",
+    "submitted": false,
+    "note": "Write about your favorite book",
+  },
+  {
+    "title": "Science Lab Report",
+    "courseCode": "SCI101",
+    "dueDate": "2024-04-11 19:52:20.763",
+    "submitted": false,
+    "note": "Experiment on photosynthesis"
+  },
+  {
+    "title": "History Quiz",
+    "courseCode": "HIST101",
+    "dueDate": "2024-04-18 19:52:20.763",
+    "submitted": false,
+    "note": "Study the Civil War",
+  },
+  {
+    "title": "Computer Programming Project",
+    "courseCode": "CS101",
+    "dueDate": "2024-04-25 19:52:20.763",
+    "submitted": false,
+    "note": "Develop a simple calculator",
+  },
+  {
+    "title": "Physics Experiment",
+    "courseCode": "PHYS101",
+    "dueDate": "2024-05-02 19:52:20.763",
+    "submitted": false,
+    "note": "Measure the speed of light",
+  },
+  {
+    "title": "Chemistry Lab Report",
+    "courseCode": "CHEM101",
+    "dueDate": "2024-05-09 19:52:20.763",
+    "submitted": true,
+    "note": "Experiment on chemical reactions"
+  },
+  {
+    "title": "Biology Study Guide",
+    "courseCode": "BIO101",
+    "dueDate": "2024-05-16 19:52:20.763",
+    "submitted": false,
+    "note": "Review cell structure and function"
+  },
+  {
+    "title": "Geography Test",
+    "courseCode": "GEO101",
+    "dueDate": "2024-05-23 19:52:20.763",
+    "submitted": false,
+    "note": "Study the geography of the United States"
+  },
+  {
+    "title": "Music Theory Exam",
+    "courseCode": "MUS101",
+    "dueDate": "2024-05-30 19:52:20.763",
+    "submitted": false,
+    "note": "Prepare for scales and chords"
+  }
+];

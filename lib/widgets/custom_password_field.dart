@@ -1,8 +1,7 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:Jedwali/controllers/login/login_controller.dart';
+import 'package:jedwali/controllers/login/login_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class CustomPasswordField extends StatelessWidget {
@@ -14,6 +13,7 @@ class CustomPasswordField extends StatelessWidget {
   final double wid;
   final TextInputAction? inputAction;
   final VoidCallbackAction? action;
+  final Color borderColor;
 
   CustomPasswordField({
     super.key,
@@ -26,6 +26,7 @@ class CustomPasswordField extends StatelessWidget {
     this.inputAction = TextInputAction.done,
     this.wid = double.infinity,
     this.action,
+    this.borderColor = Colors.grey,
   });
 
   final TextEditingController controller;
@@ -34,11 +35,29 @@ class CustomPasswordField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final error = loginController.activeError;
     return Obx(
       () => TextField(
         controller: controller,
         obscureText: hideTextValue,
         decoration: InputDecoration(
+          enabledBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(16),
+            ),
+            borderSide: BorderSide(
+              color: borderColor,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(16),
+            ),
+            borderSide: BorderSide(
+              color: error ? Colors.red : Theme.of(context).primaryColor,
+              width: 2,
+            ),
+          ),
           prefixIcon: Icon(icon),
           suffixIcon: isPassword
               ? GestureDetector(
@@ -69,11 +88,6 @@ class CustomPasswordField extends StatelessWidget {
           hintText: hint,
           hintStyle: const TextStyle(
             color: Colors.grey,
-          ),
-          border: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(16),
-            ),
           ),
           constraints: const BoxConstraints(
             maxHeight: 200,

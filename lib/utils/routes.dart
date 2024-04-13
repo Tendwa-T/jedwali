@@ -1,7 +1,7 @@
-import 'package:Jedwali/app.dart';
-import 'package:Jedwali/login.dart';
-import 'package:Jedwali/views/classes_page.dart';
-import 'package:Jedwali/views/registration_page.dart';
+import 'package:jedwali/app.dart';
+import 'package:jedwali/login.dart';
+import 'package:jedwali/views/classes_page.dart';
+import 'package:jedwali/views/registration_page.dart';
 import 'package:get/get.dart';
 
 class Routes {

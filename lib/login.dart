@@ -1,10 +1,10 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:Jedwali/configs/constants.dart';
-import 'package:Jedwali/controllers/login/login_controller.dart';
-import 'package:Jedwali/utils/imageProvider.dart';
-import 'package:Jedwali/views/login_page.dart';
-import 'package:Jedwali/views/registration_page.dart';
+import 'package:jedwali/configs/constants.dart';
+import 'package:jedwali/controllers/login/login_controller.dart';
+import 'package:jedwali/utils/imageProvider.dart';
+import 'package:jedwali/views/login_page.dart';
+import 'package:jedwali/views/registration_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

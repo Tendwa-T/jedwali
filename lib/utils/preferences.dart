@@ -21,19 +21,37 @@ class Preferences {
     SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
     return sharedPrefs.getBool(key) ?? false;
   }
+
+  Future<bool> clearAll() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.clear();
+  }
 }
 
 class PrefsController extends GetxController {
   final Preferences prefs = Preferences();
-  RxString name = "".obs;
+  RxString name = "XX".obs;
+  RxString studentID = "XX".obs;
 
   @override
   void onInit() {
     super.onInit();
-    loadName();
+    loadDetails();
   }
 
-  void loadName() async {
+  @override
+  void onClose() {
+    removeData();
+    super.onClose();
+  }
+
+  void loadDetails() async {
     name.value = await prefs.getValue("name");
+    studentID.value = await prefs.getValue("student_id");
+  }
+
+  void removeData() async {
+    name.value = "";
+    studentID.value = "";
   }
 }

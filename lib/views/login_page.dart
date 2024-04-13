@@ -1,12 +1,12 @@
-import 'package:Jedwali/configs/constants.dart';
-import 'package:Jedwali/controllers/login/login_controller.dart';
-import 'package:Jedwali/utils/preferences.dart';
-import 'package:Jedwali/widgets/custom_password_field.dart';
-import 'package:Jedwali/widgets/custom_text.dart';
-import 'package:Jedwali/widgets/custom_text_field.dart';
+import 'package:flutter/services.dart';
+import 'package:jedwali/configs/constants.dart';
+import 'package:jedwali/controllers/login/login_controller.dart';
+import 'package:jedwali/utils/preferences.dart';
+import 'package:jedwali/widgets/custom_password_field.dart';
+import 'package:jedwali/widgets/custom_text.dart';
+import 'package:jedwali/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:toastification/toastification.dart';
 import 'dart:ui' as ui;
 
 class LoginPage extends StatelessWidget {
@@ -20,10 +20,13 @@ class LoginPage extends StatelessWidget {
   Preferences preferences = Preferences();
   @override
   Widget build(BuildContext context) {
-    final RxBool isLoading = false.obs;
     preferences.getValue("username").then((value) {
       _usernameController.text = value;
+      preferences.getValue("password").then((value) {
+        _passwordController.text = value;
+      });
     });
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
@@ -31,9 +34,10 @@ class LoginPage extends StatelessWidget {
           children: [
             CustomTextField(
               controller: _usernameController,
-              label: "Username",
-              hint: "Enter username",
+              label: "Admission Number",
+              hint: "Enter Admission Number",
               icon: Icons.person,
+              formatter: [AdmissionNumberFormatter()],
             ),
             const SizedBox(
               height: 20,
@@ -112,9 +116,12 @@ class LoginPage extends StatelessWidget {
                       loginController.updateLoading(false);
                       if (await loginController.rememberMe == true) {
                         await preferences.setValueString("username", uName);
+                        await preferences.setValueString("password", pWord);
+
                         loginController.updateLoading(false);
                       } else {
                         await preferences.setValueString("username", "");
+                        await preferences.setValueString("password", "");
                         loginController.updateLoading(false);
                       }
                       _passwordController.clear();
@@ -163,8 +170,11 @@ class LoginPage extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            Obx(() =>
-            loginController.isLoading.value ? _buildLoadingScreen() : SizedBox.shrink()),
+            Obx(
+              () => loginController.isLoading.value
+                  ? _buildLoadingScreen()
+                  : Container(),
+            ),
           ],
         ),
       ),
@@ -182,4 +192,28 @@ Widget _buildLoadingScreen() {
       ),
     ),
   );
+}
+
+class AdmissionNumberFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final newValueText = newValue.text;
+    if (newValueText == "") {
+      return newValue;
+    } else if (newValueText.length <= 2) {
+      return newValue;
+    } else if (newValueText.length == 3) {
+      return newValueText.endsWith('-')
+          ? newValue
+          : TextEditingValue(
+              text:
+                  "${newValueText.substring(0, 2)}-${newValueText.substring(2)}",
+            );
+    } else if (newValueText.length <= 7) {
+      return newValue;
+    } else {
+      return oldValue;
+    }
+  }
 }
